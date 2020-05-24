@@ -2,7 +2,7 @@
 
 2015920003 컴퓨터과학부 김건호
 
-![uuuurl](./img/uuuurl_plus.png)
+![uuuurl](./functions/public/img/uuuurl_plus.png)
 
 
 
