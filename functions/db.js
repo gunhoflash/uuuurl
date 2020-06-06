@@ -6,10 +6,21 @@ const keylen = 24;
 
 let DB = null;
 
+/*
+
+	Set and initialize DB.
+	You should call it at first to use any other functions.
+
+*/
 exports.initDB = (db) => {
 	DB = db;
 };
 
+/*
+
+	Find and return all shorten URLs.
+
+*/
 exports.searchAllURL = async (res) => {
 	let docs = await exports.printAllURL();
 
@@ -17,11 +28,21 @@ exports.searchAllURL = async (res) => {
 	return docs;
 };
 
-exports.searchURL = async (res, hashed, redirect = true) => {
-	if (R.isInvalid(res, hashed)) return null;
+/*
 
-	let doc = await DB.collection('link').doc(hashed).get();
+	Find specific URL with hash string.
+	Redirect user to the URL or response.
 
+*/
+exports.searchURL = async (res, hash, redirect = true) => {
+
+	// handle exception: invalid value
+	if (R.isInvalid(res, hash)) return null;
+
+	// find URL
+	let doc = await DB.collection('link').doc(hash).get();
+
+	// if URL not found,
 	if (!doc.exists) {
 		if (redirect) {
 			R.status(res, 404);
@@ -31,9 +52,9 @@ exports.searchURL = async (res, hashed, redirect = true) => {
 		return null;
 	}
 
+	// populate data and redirect or response.
 	let data = await doc.data();
 	console.log(data);
-
 	if (redirect) {
 		res.redirect(302, data.url);
 	} else {
@@ -43,21 +64,27 @@ exports.searchURL = async (res, hashed, redirect = true) => {
 	return data.url;
 };
 
-// TODO: check url validity
+/*
+
+	Create a new shorten URL for given URL using hash.
+	Save the hash to DB.
+
+*/
 exports.insertURL = async (res, url) => {
 	if (R.isInvalid(res, url)) return;
 
-	let hashed = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
-	let doc = await DB.collection('link').doc(hashed);
+	
+	let hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
+	let doc = await DB.collection('link').doc(hash);
 
 	await doc.set({ url: url });
-	R.response(res, true, hashed);
+	R.response(res, true, hash);
 };
 
-exports.deleteURL = async (res, hashed) => {
-	if (R.isInvalid(res, hashed)) return;
+exports.deleteURL = async (res, hash) => {
+	if (R.isInvalid(res, hash)) return;
 
-	let doc = await DB.collection('link').doc(hashed).get();
+	let doc = await DB.collection('link').doc(hash).get();
 
 	if (!doc.exists) {
 		R.response(res, false, 'Link Not Found');

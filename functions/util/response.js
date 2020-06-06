@@ -1,5 +1,7 @@
-/* Usage
-	response(res, true, 'success!');
+/*
+
+	Response user with data and message. (status 200)
+
 */
 exports.response = (res, success, message, data = {}) => {
 	console.log(`[RESPONSE] ${message}`);
@@ -12,8 +14,26 @@ exports.response = (res, success, message, data = {}) => {
 	}
 };
 
-/* Usage
-	if (isInvalid(res, req.body.p1, req.body.p2, ...)) return;
+/*
+
+	Redirect user. (status 302)
+
+*/
+exports.redirect = (res, url) => {
+	console.log(`[REDIRECT] ${url}`);
+	if (res) {
+		res.redirect(302, url);
+	}
+};
+
+/*
+
+	If some of values in args are falsy,
+	response to user.
+
+	This function is used to check
+	validity of query data.
+
 */
 exports.isInvalid = (res, ...args) => {
 	let b = args.some(v => (v === null || v === undefined || v.length === 0));
@@ -21,6 +41,12 @@ exports.isInvalid = (res, ...args) => {
 	return b;
 };
 
+/*
+
+	Set the HTTP status for the response.
+	Send specific error message.
+
+*/
 exports.status = (res, code) => {
 	let message = '';
 	switch (code) {

@@ -37,11 +37,12 @@ app.get('/', (req, res) => {
 app.get('/link', async (req, res) => {
 	await DB.searchAllURL(res);
 });
-app.get('/h/:hashed', async (req, res) => {
-	await DB.searchURL(res, req.params.hashed, true);
+app.get('/find/:hash', async (req, res) => {
+	await DB.searchURL(res, req.params.hash, false);
 });
-app.get('/t/:hashed', async (req, res) => {
-	await DB.searchURL(res, req.params.hashed, false);
+app.get('/:c/:hash', async (req, res) => {
+	if (req.params.c.length !== 1) return;
+	await DB.searchURL(res, req.params.hash, true);
 });
 
 // POST

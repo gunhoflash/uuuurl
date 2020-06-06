@@ -29,8 +29,8 @@
 			console.log(list);
 		};
 
-		const searchURL = async (hashed) => {
-			let list = await req('/t/' + hashed, 'GET');
+		const searchURL = async (hash) => {
+			let list = await req('/t/' + hash, 'GET');
 			console.log(list.data);
 			window.location.href = list.data;
 		};
