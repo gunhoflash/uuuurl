@@ -55,6 +55,10 @@ exports.status = (res, code) => {
 		default:                                         break;
 	}
 	console.log(`[STATUS ${code}] ${message}`);
-	if (res)
-		res.status(code).send(message);
+	if (res) {
+		res.status(code).render('error', {
+			code: code,
+			message: message
+		});
+	}
 };
