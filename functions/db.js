@@ -34,12 +34,13 @@ exports.searchAllURL = async (res) => {
 	Redirect user to the URL or response.
 
 */
-exports.searchURL = async (res, hash, redirect = true) => {
+exports.searchURL = async (res, c, hash, redirect = true) => {
 
 	// handle exception: invalid value
-	if (R.isInvalid(res, hash)) return null;
+	if (R.isInvalid(res, c, hash)) return null;
 
 	// find URL
+	hash  = c + hash;
 	let doc = await DB.collection('link').doc(hash).get();
 
 	// if URL not found,
@@ -56,7 +57,7 @@ exports.searchURL = async (res, hash, redirect = true) => {
 	let data = await doc.data();
 	console.log(data);
 	if (redirect) {
-		res.redirect(302, data.url);
+		R.redirect(res, data.url);
 	} else {
 		R.response(res, true, 'Link found.', data.url);
 	}
@@ -70,15 +71,35 @@ exports.searchURL = async (res, hash, redirect = true) => {
 	Save the hash to DB.
 
 */
-exports.insertURL = async (res, url) => {
+exports.insertURL = async (req, res, url) => {
 	if (R.isInvalid(res, url)) return;
 
-	
-	let hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
-	let doc = await DB.collection('link').doc(hash);
+	let hash, full_hash, doc, get, len;
+	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
 
-	await doc.set({ url: url });
-	R.response(res, true, hash);
+	for (i = 2, len = full_hash.length; i < len; i++) {
+		hash = full_hash.slice(0, i);
+		doc = await DB.collection('link').doc(hash);
+		get = await doc.get();
+
+		if (get.exists) {
+			if (get.data().url == url) {
+				// same url exist
+				R.response(res, true, fullURL(req, hash));
+				return;
+			}
+			// check whether the URL is same
+		} else {
+			// save
+			console.log(`save "${url}" as "${hash}"`);
+			await doc.set({ url: url });
+			R.response(res, true, fullURL(req, hash));
+			return;
+		}
+	}
+
+	// not saved
+	R.response(res, false, '');
 };
 
 exports.deleteURL = async (res, hash) => {
@@ -107,4 +128,13 @@ exports.printAllURL = async () => {
 	console.log(`${n} found`);
 
 	return snapshot;
+};
+
+/*
+
+	Generate full URL with hash.
+
+*/
+const fullURL = (req, hash) => {
+	return `${req.headers.origin}/${hash[0]}/${hash.slice(1)}`;
 };

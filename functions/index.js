@@ -37,17 +37,16 @@ app.get('/', (req, res) => {
 app.get('/link', async (req, res) => {
 	await DB.searchAllURL(res);
 });
-app.get('/find/:hash', async (req, res) => {
-	await DB.searchURL(res, req.params.hash, false);
+app.get('/find/:c/:hash', async (req, res) => {
+	await DB.searchURL(res, req.params.c, req.params.hash, false);
 });
 app.get('/:c/:hash', async (req, res) => {
-	if (req.params.c.length !== 1) return;
-	await DB.searchURL(res, req.params.hash, true);
+	await DB.searchURL(res, req.params.c, req.params.hash, true);
 });
 
 // POST
 app.post('/link', async (req, res) => {
-	await DB.insertURL(res, req.body.url);
+	await DB.insertURL(req, res, req.body.url);
 });
 
 // DELETE

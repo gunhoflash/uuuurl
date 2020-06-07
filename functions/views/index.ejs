@@ -30,7 +30,7 @@
 		};
 
 		const searchURL = async (hash) => {
-			let list = await req('/t/' + hash, 'GET');
+			let list = await req('/find/' + hash, 'GET');
 			console.log(list.data);
 			window.location.href = list.data;
 		};
