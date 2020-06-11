@@ -4,20 +4,28 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>uuuurl</title>
-	<link rel="stylesheet" href="css/milligram.min.css">
-	<link rel="stylesheet" href="css/normalize.min.css">
+	<link rel="stylesheet" href="/css/milligram.min.css">
+	<link rel="stylesheet" href="/css/normalize.min.css">
 	<script src="/js/js.js"></script>
 </head>
-<body>
-	<img src="/img/uuuurl_plus.png" alt="uuuurl image">
-	<h1>uuuurl</h1>
-	<input type="url" name="input_url" id="input_url" placeholder="URL here">
-	<button id="btn_search_url">Search URL</button>
-	<button id="btn_shorten_url">Shorten URL</button>
+<body class="vh-100 flex flex-column">
+	<div class="box px-4">
+		<img src="/img/uuuurl_plus.png" alt="uuuurl image">
+		<form method="POST" action="/link" class="flex flex-column">
+			<fieldset class="box">
+				<label for="input_url">Type URL to shorten</label>
+				<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga">
+				<input type="hidden" name="resType" value="web">
+				<button id="btn_shorten_url" class="button" type="submit">Shorten URL</button>
+			</fieldset>
+		</form>
+		<!-- <button id="btn_search_url" class="button">Search URL</button> -->
+	</div>
 
 	<script>
 		let input_url       = document.getElementById('input_url');
-		let btn_search_url  = document.getElementById('btn_search_url');
+		// let btn_search_url  = document.getElementById('btn_search_url');
+		let form_shorten_url = document.getElementById('form_shorten_url');
 		let btn_shorten_url = document.getElementById('btn_shorten_url');
 
 		const init = async () => {
@@ -26,8 +34,9 @@
 		};
 
 		const registerURL = async (url) => {
-			let list = await req('/link', 'POST', { url: url });
-			console.log(list);
+			await req('/link', 'POST', { url: url, resType: 'json' });
+			//let list = await req('/link', 'POST', { url: url, resType: 'web' });
+			//console.log(list);
 		};
 
 		const searchURL = async (hash) => {
@@ -36,12 +45,13 @@
 			window.location.href = list.data;
 		};
 
-		btn_search_url.addEventListener("click", () => {
-			searchURL(input_url.value);
-		});
-		btn_shorten_url.addEventListener("click", () => {
-			registerURL(input_url.value);
-		});
+		// btn_search_url.addEventListener("click", () => {
+		// 	searchURL(input_url.value);
+		// });
+		// form_shorten_url.addEventListener("submit", (e) => {
+		// 	e.preventDefault();
+		// 	registerURL(input_url.value);
+		// });
 	</script>
 </body>
 </html>

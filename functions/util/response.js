@@ -28,6 +28,20 @@ exports.redirect = (res, url) => {
 
 /*
 
+	Render page. (status 200)
+
+*/
+exports.render = (res, page, data = {}) => {
+	console.log(`[RENDER] '${page}' with data:\n${JSON.stringify(data, null, 2)}`);
+	if (res) {
+		res
+		.set('Content-Type', 'text/html')
+		.render(page, data);
+	}
+};
+
+/*
+
 	If some of values in args are falsy,
 	response to user.
 

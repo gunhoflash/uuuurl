@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>uuuurl - Result</title>
+	<link rel="stylesheet" href="/css/milligram.min.css">
+	<link rel="stylesheet" href="/css/normalize.min.css">
+</head>
+<body class="vh-100 flex flex-column">
+	<div class="box p-4">
+		<%
+			var message, content;
+			switch (result) {
+
+				case 0:
+				message = 'Success';
+				content = `Short URL: ${url}`;
+				break;
+				
+				case 1:
+				message = 'Fail';
+				content = 'Need another hash to save the URL.';
+				break;
+				
+				default:
+				message = 'Error';
+				content = 'Unexpected error!';
+				break;
+			}
+		%>
+		<h1><%= message %></h1>
+		<p><%= content %></p>
+		<a href="/" class="button mt-3">Back to uuuurl</a>
+	</div>
+</body>
+</html>

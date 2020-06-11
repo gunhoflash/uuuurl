@@ -46,7 +46,7 @@ app.get('/:c/:hash', async (req, res) => {
 
 // POST
 app.post('/link', async (req, res) => {
-	await DB.insertURL(req, res, req.body.url);
+	await DB.insertURL(req, res, req.body.url, req.body.resType);
 });
 
 // DELETE

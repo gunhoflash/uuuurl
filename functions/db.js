@@ -40,7 +40,7 @@ exports.searchURL = async (res, c, hash, redirect = true) => {
 	if (R.isInvalid(res, c, hash)) return null;
 
 	// find URL
-	hash  = c + hash;
+	hash = c + hash;
 	let doc = await DB.collection('link').doc(hash).get();
 
 	// if URL not found,
@@ -70,36 +70,54 @@ exports.searchURL = async (res, c, hash, redirect = true) => {
 	Create a new shorten URL for given URL using hash.
 	Save the hash to DB.
 
+	If resType(response type) is 'web', redirect to result page.
+
 */
-exports.insertURL = async (req, res, url) => {
+exports.insertURL = async (req, res, url, resType) => {
 	if (R.isInvalid(res, url)) return;
 
-	let hash, full_hash, doc, get, len;
+	let hash, full_hash, len;
 	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
 
 	for (i = 2, len = full_hash.length; i < len; i++) {
 		hash = full_hash.slice(0, i);
-		doc = await DB.collection('link').doc(hash);
-		get = await doc.get();
+		let doc = await DB.collection('link').doc(hash);
+		let get = await doc.get();
 
 		if (get.exists) {
 			if (get.data().url == url) {
 				// same url exist
-				R.response(res, true, fullURL(req, hash));
-				return;
+				break;
 			}
-			// check whether the URL is same
 		} else {
 			// save
 			console.log(`save "${url}" as "${hash}"`);
 			await doc.set({ url: url });
-			R.response(res, true, fullURL(req, hash));
-			return;
+			break;
 		}
 	}
 
-	// not saved
-	R.response(res, false, '');
+	if (i >= len) {
+		// not saved
+		if (resType === 'web') {
+			R.render(res, 'result', {
+				result: 1 // need another hash to save the URL
+			});
+		} else {
+			R.response(res, false, 'Need another hash to save the URL.');
+		}
+	} else {
+		// saved
+		let s = fullURL(req, hash);
+		if (resType === 'web') {
+			R.render(res, 'result', {
+				result: 0, // success
+				url: s
+			});
+		} else {
+			R.response(res, true, s);
+		}
+	}
 };
 
 exports.deleteURL = async (res, hash) => {

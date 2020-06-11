@@ -36,7 +36,7 @@
     "array-callback-return": 1,
 
     // Require the use of === and !==
-    "eqeqeq": 2,
+    "eqeqeq": 1,
 
     // Disallow the use of alert, confirm, and prompt
     "no-alert": 2,
@@ -87,7 +87,7 @@
     "getter-return": 2,
 
     // Disallow await inside of loops
-    "no-await-in-loop": 2,
+    "no-await-in-loop": 1,
 
     // Disallow comparing against -0
     "no-compare-neg-zero": 2,
