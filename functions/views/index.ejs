@@ -8,25 +8,37 @@
 	<link rel="stylesheet" href="/css/normalize.min.css">
 	<script src="/js/js.js"></script>
 </head>
-<body class="vh-100 flex flex-column">
-	<div class="box px-4">
-		<img src="/img/uuuurl_plus.png" alt="uuuurl image">
-		<form method="POST" action="/link" class="flex flex-column">
-			<fieldset class="box">
-				<label for="input_url">Type URL to shorten</label>
-				<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga">
-				<input type="hidden" name="resType" value="web">
-				<button id="btn_shorten_url" class="button" type="submit">Shorten URL</button>
-			</fieldset>
-		</form>
-		<!-- <button id="btn_search_url" class="button">Search URL</button> -->
+<body class="vh-100">
+	<div class="vh-100 flex flex-column box mx-auto">
+		<div class="p-4">
+			<img src="/img/uuuurl_plus.png" alt="uuuurl image">
+			<form method="POST" action="/link" class="flex flex-column pb-3">
+				<fieldset class="box">
+					<label for="input_url">Type URL to shorten</label>
+					<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga">
+					<input type="hidden" name="resType" value="web">
+					<button id="btn_shorten_url" class="button" type="submit">Shorten URL</button>
+				</fieldset>
+			</form>
+		</div>
 	</div>
+	<hr>
+	<div class="box mx-auto">
+		<div class="p-4">
+			<h2>Shortened URLs</h2>
+			<ul id="url_list"></ul>
+		</div>
+	</div>
+	<hr>
+	<footer class="t-center p-4">
+		gunhoflash@naver.com
+	</footer>
 
 	<script>
-		let input_url       = document.getElementById('input_url');
-		// let btn_search_url  = document.getElementById('btn_search_url');
+		let input_url        = document.getElementById('input_url');
 		let form_shorten_url = document.getElementById('form_shorten_url');
-		let btn_shorten_url = document.getElementById('btn_shorten_url');
+		let btn_shorten_url  = document.getElementById('btn_shorten_url');
+		let url_list         = document.getElementById('url_list');
 
 		const init = async () => {
 			let list = await req('/link', 'GET');
@@ -45,13 +57,20 @@
 			window.location.href = list.data;
 		};
 
-		// btn_search_url.addEventListener("click", () => {
-		// 	searchURL(input_url.value);
-		// });
-		// form_shorten_url.addEventListener("submit", (e) => {
-		// 	e.preventDefault();
-		// 	registerURL(input_url.value);
-		// });
+		const searchAllURLs = async () => {
+			let data = await req('/link', 'GET');
+			data = data.data;
+
+			console.log(data);
+
+			let str = '';
+			for (const doc of data) {
+				str += `<li>${doc.url} &#11166; ${doc.short}</li>`
+			}
+			url_list.innerHTML = str;//JSON.stringify(data, null, 2);
+		};
+
+		searchAllURLs();
 	</script>
 </body>
 </html>

@@ -21,8 +21,13 @@ exports.initDB = (db) => {
 	Find and return all shorten URLs.
 
 */
-exports.searchAllURL = async (res) => {
+exports.searchAllURL = async (req, res) => {
 	let docs = await exports.printAllURL();
+
+	// make hash to full-url
+	docs.forEach(doc => {
+		doc.short = fullURL(req, doc.short);
+	});
 
 	R.response(res, true, `${docs.length} found.`, docs);
 	return docs;
@@ -135,17 +140,14 @@ exports.deleteURL = async (res, hash) => {
 };
 
 exports.printAllURL = async () => {
-	let n = 0;
 	let snapshot = await DB.collection('link').get();
 
 	console.log(`Print all URL:`);
-	snapshot.forEach(doc => {
-		console.log(doc.id, '=>', doc.data());
-		n++;
-	});
-	console.log(`${n} found`);
+	let docs = snapshot.docs.map(doc => Object.assign(doc.data(), { short: doc.id }));
+	console.log(docs);
+	console.log(`${docs.length} found`);
 
-	return snapshot;
+	return docs;
 };
 
 /*

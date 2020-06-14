@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
 	res.render('index');
 });
 app.get('/link', async (req, res) => {
-	await DB.searchAllURL(res);
+	await DB.searchAllURL(req, res);
 });
 app.get('/find/:c/:hash', async (req, res) => {
 	await DB.searchURL(res, req.params.c, req.params.hash, false);
