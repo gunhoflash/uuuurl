@@ -23,9 +23,7 @@ const app = express();
 // Automatically allow cross-origin requests
 app.use(cors({ origin: true }));
 
-// Add middleware to authenticate requests
-// app.use(myMiddleware);
-
+// set view engine and static directories
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use(express.static('public'));
@@ -34,24 +32,20 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
 	res.render('index');
 });
-app.get('/link', async (req, res) => {
-	await DB.searchAllURL(req, res);
-});
-app.get('/find/:c/:hash', async (req, res) => {
-	await DB.searchURL(res, req.params.c, req.params.hash, false);
-});
+
+app.route('/link')
+	.get(async (req, res) => {
+		await DB.searchAllURL(req, res);
+	})
+	.post(async (req, res) => {
+		await DB.insertURL(req, res, req.body.url, req.body.resType);
+	})
+	.delete(async (req, res) => { 
+		await DB.deleteURL(res, req.body.url);
+	});
+
 app.get('/:c/:hash', async (req, res) => {
-	await DB.searchURL(res, req.params.c, req.params.hash, true);
-});
-
-// POST
-app.post('/link', async (req, res) => {
-	await DB.insertURL(req, res, req.body.url, req.body.resType);
-});
-
-// DELETE
-app.delete('/link', async (req, res) => { 
-	await DB.deleteURL(res, req.body.url);
+	await DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
 });
 
 // handle 404

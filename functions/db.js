@@ -39,7 +39,7 @@ exports.searchAllURL = async (req, res) => {
 	Redirect user to the URL or response.
 
 */
-exports.searchURL = async (res, c, hash, redirect = true) => {
+exports.searchURL = async (res, c, hash, no_redirect) => {
 
 	// handle exception: invalid value
 	if (R.isInvalid(res, c, hash)) return null;
@@ -50,10 +50,10 @@ exports.searchURL = async (res, c, hash, redirect = true) => {
 
 	// if URL not found,
 	if (!doc.exists) {
-		if (redirect) {
-			R.status(res, 404);
-		} else {
+		if (no_redirect) {
 			R.response(res, false, 'Link not found');
+		} else {
+			R.status(res, 404);
 		}
 		return null;
 	}
@@ -61,10 +61,10 @@ exports.searchURL = async (res, c, hash, redirect = true) => {
 	// populate data and redirect or response.
 	let data = await doc.data();
 	console.log(data);
-	if (redirect) {
-		R.redirect(res, data.url);
-	} else {
+	if (no_redirect) {
 		R.response(res, true, 'Link found.', data.url);
+	} else {
+		R.redirect(res, data.url);
 	}
 
 	return data.url;
