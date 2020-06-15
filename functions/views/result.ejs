@@ -30,14 +30,14 @@
 			}
 		%>
 		<h1><%= message %></h1>
-		<p>
-			<%= content %>
+		<div class="flex flex-wrap justify-content-start">
+			<span class="mr-2"><%= content %></span>
 			<% if (path != null) { %>
-				<a id="shortened"></a>
-				<button class="button button-small button-reversal mb-0 ml-4 copy2clipboard" data-clipboard-target="#shortened">Copy</button>
+				<a id="shortened" class="mr-2"></a>
+				<button class="button button-small button-reversal mb-0 copy2clipboard" data-clipboard-target="#shortened">Copy</button>
 			<% } %>
-		</p>
-		<a href="/" class="button mt-3">Back to uuuurl</a>
+		</div>
+		<a href="/" class="button mt-4">Back to uuuurl</a>
 	</div>
 
 	<% if (path != null) { %>
