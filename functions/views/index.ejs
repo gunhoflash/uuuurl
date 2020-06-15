@@ -10,10 +10,10 @@
 </head>
 <body class="vh-100">
 	<div class="vh-100 flex flex-column box mx-auto">
-		<div class="p-4">
+		<div class="p-3">
 			<img src="/img/uuuurl_plus.png" alt="uuuurl image">
 			<form method="POST" action="/link" class="flex flex-column pb-3">
-				<fieldset class="box">
+				<fieldset class="box p-0">
 					<label for="input_url">Type URL to shorten</label>
 					<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga">
 					<input type="hidden" name="resType" value="web">
@@ -24,9 +24,9 @@
 	</div>
 	<hr>
 	<div class="box mx-auto">
-		<div class="p-4">
+		<div class="p-3">
 			<h2>Shortened URLs</h2>
-			<ul id="url_list"></ul>
+			<div id="url_list"></div>
 		</div>
 	</div>
 	<hr>
@@ -58,19 +58,25 @@
 		};
 
 		const searchAllURLs = async () => {
+			const origin = location.origin;
 			let data = await req('/link', 'GET');
 			data = data.data;
 
-			console.log(data);
-
-			let str = '';
+			let short_url, i = 0, str = '';
 			for (const doc of data) {
-				str += `<li>${doc.url} &#11166; ${doc.short}</li>`
+				short_url = origin + doc.short;
+				str += `<div class="row mb-2">
+					<div class="column column-40 over-ellipsis">${doc.url}</div>
+					<div class="column column-40 over-ellipsis"><a id="shortened-${i}" href="${short_url}">${short_url}</a></div>
+					<div class="column t-end"><button class="button button-small button-reversal m-0 copy2clipboard" data-clipboard-target="#shortened-${i}">Copy</button></div>
+				</div>`;
+				i++;
 			}
-			url_list.innerHTML = str;//JSON.stringify(data, null, 2);
+			url_list.innerHTML = str;
 		};
 
 		searchAllURLs();
 	</script>
+	<%- include('common_script'); -%>
 </body>
 </html>

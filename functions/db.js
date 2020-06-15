@@ -26,7 +26,7 @@ exports.searchAllURL = async (req, res) => {
 
 	// make hash to full-url
 	docs.forEach(doc => {
-		doc.short = fullURL(req, doc.short);
+		doc.short = hash2path(doc.short);
 	});
 
 	R.response(res, true, `${docs.length} found.`, docs);
@@ -113,11 +113,11 @@ exports.insertURL = async (req, res, url, resType) => {
 		}
 	} else {
 		// saved
-		let s = fullURL(req, hash);
+		let s = hash2path(hash);
 		if (resType === 'web') {
 			R.render(res, 'result', {
 				result: 0, // success
-				url: s
+				path: s
 			});
 		} else {
 			R.response(res, true, s);
@@ -155,6 +155,6 @@ exports.printAllURL = async () => {
 	Generate full URL with hash.
 
 */
-const fullURL = (req, hash) => {
-	return `${req.headers.origin}/${hash[0]}/${hash.slice(1)}`;
+const hash2path = (hash) => {
+	return `/${hash[0]}/${hash.slice(1)}`;
 };

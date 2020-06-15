@@ -15,7 +15,7 @@
 
 				case 0:
 				message = 'Success';
-				content = `Short URL: ${url}`;
+				content = `Short URL : `;
 				break;
 				
 				case 1:
@@ -30,8 +30,25 @@
 			}
 		%>
 		<h1><%= message %></h1>
-		<p><%= content %></p>
+		<p>
+			<%= content %>
+			<% if (path != null) { %>
+				<a id="shortened"></a>
+				<button class="button button-small button-reversal mb-0 ml-4 copy2clipboard" data-clipboard-target="#shortened">Copy</button>
+			<% } %>
+		</p>
 		<a href="/" class="button mt-3">Back to uuuurl</a>
 	</div>
+
+	<% if (path != null) { %>
+		<script>
+			var a = document.getElementById('shortened');
+			var path = location.origin + '<%- path -%>';
+			
+			a.innerHTML = path;
+			a.setAttribute('href', path);
+		</script>
+		<%- include('common_script'); -%>
+	<% } %>
 </body>
 </html>
