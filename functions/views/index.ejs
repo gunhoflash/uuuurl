@@ -23,24 +23,9 @@
 		</div>
 	</div>
 	<hr>
-	<footer class="t-center p-4">
-		gunhoflash@naver.com
-	</footer>
+	<footer class="t-center p-4">gunhoflash@naver.com</footer>
 
 	<script>
-		let input_url        = document.getElementById('input_url');
-		let form_shorten_url = document.getElementById('form_shorten_url');
-		let url_list         = document.getElementById('url_list');
-
-		const init = async () => {
-			let list = await req('/link', 'GET');
-			console.log(list);
-		};
-
-		const registerURL = async (url) => {
-			await req('/link', 'POST', { url: url, resType: 'json' });
-		};
-
 		const searchAllURLs = async () => {
 			const origin = location.origin;
 			let data = await req('/link', 'GET');
@@ -56,7 +41,7 @@
 				</div>`;
 				i++;
 			}
-			url_list.innerHTML = str;
+			document.getElementById('url_list').innerHTML = str;
 		};
 
 		searchAllURLs();
