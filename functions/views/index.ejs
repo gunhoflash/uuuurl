@@ -39,14 +39,6 @@
 
 		const registerURL = async (url) => {
 			await req('/link', 'POST', { url: url, resType: 'json' });
-			//let list = await req('/link', 'POST', { url: url, resType: 'web' });
-			//console.log(list);
-		};
-
-		const searchURL = async (hash) => {
-			let list = await req('/find/' + hash, 'GET');
-			console.log(list.data);
-			window.location.href = list.data;
 		};
 
 		const searchAllURLs = async () => {
