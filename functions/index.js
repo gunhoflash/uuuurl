@@ -36,10 +36,10 @@ app.get('/', (req, res) => {
 
 app.route('/link')
 	.get(async (req, res) => {
-		await DB.searchAllURL(req, res);
+		await DB.searchAllURL(res);
 	})
 	.post(async (req, res) => {
-		await DB.insertURL(req, res, req.body.url, req.body.resType);
+		await DB.insertURL(res, req.body.url, req.body.resType);
 	})
 	.delete(async (req, res) => {
 		let input_password = req.body.password;

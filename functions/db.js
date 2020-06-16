@@ -21,7 +21,7 @@ exports.initDB = (db) => {
 	Find and return all shorten URLs.
 
 */
-exports.searchAllURL = async (req, res) => {
+exports.searchAllURL = async (res) => {
 	let docs = await exports.printAllURL();
 
 	// make hash to full-url
@@ -79,11 +79,12 @@ exports.searchURL = async (res, c, hash, no_redirect) => {
 	If resType(response type) is 'web', redirect to result page.
 
 */
-exports.insertURL = async (req, res, url, resType) => {
+exports.insertURL = async (res, url, resType) => {
 	if (R.isInvalid(res, url)) return;
 
 	let hash, full_hash, len;
 	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
+	console.log(`full_hash: ${full_hash}`);
 
 	for (i = 2, len = full_hash.length; i < len; i++) {
 		hash = full_hash.slice(0, i);
