@@ -2,7 +2,7 @@ const R = require('./util/response');
 const crypto = require('crypto');
 const salt = 'test';
 const iterations = 1000;
-const keylen = 24;
+const keylen = 32;
 
 let DB = null;
 
