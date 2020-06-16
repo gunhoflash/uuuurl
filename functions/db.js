@@ -83,7 +83,7 @@ exports.insertURL = async (res, url, resType) => {
 	if (R.isInvalid(res, url)) return;
 
 	let hash, full_hash, len;
-	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64');
+	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64').replace('/', '_');
 	console.log(`full_hash: ${full_hash}`);
 
 	for (i = 2, len = full_hash.length; i < len; i++) {
