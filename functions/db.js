@@ -1,6 +1,6 @@
 const R = require('./util/response');
 const crypto = require('crypto');
-const salt = 'test';
+const salt = require('./keys.json').salt;
 const iterations = 1000;
 const keylen = 32;
 
