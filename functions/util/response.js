@@ -64,8 +64,9 @@ exports.isInvalid = (res, ...args) => {
 exports.status = (res, code) => {
 	let message = '';
 	switch (code) {
-		case 404: message = '404 not found';             break;
-		case 500: message = '500 internal server error'; break;
+		case 401: message = '401 Unauthorized';          break;
+		case 404: message = '404 Not Found';             break;
+		case 500: message = '500 Internal Server Error'; break;
 		default:                                         break;
 	}
 	console.log(`[STATUS ${code}] ${message}`);

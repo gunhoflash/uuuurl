@@ -26,7 +26,8 @@ exports.searchAllURL = async (req, res) => {
 
 	// make hash to full-url
 	docs.forEach(doc => {
-		doc.short = hash2path(doc.short);
+		doc.path = hash2path(doc.short);
+		delete doc.short;
 	});
 
 	R.response(res, true, `${docs.length} found.`, docs);
@@ -125,17 +126,22 @@ exports.insertURL = async (req, res, url, resType) => {
 	}
 };
 
-exports.deleteURL = async (res, hash) => {
-	if (R.isInvalid(res, hash)) return;
+exports.deleteURL = async (res, path) => {
+	if (R.isInvalid(res, path)) return;
 
-	let doc = await DB.collection('link').doc(hash).get();
+	let docRef = DB.collection('link').doc(path2hash(path));
+	let doc = await docRef.get();
 
+	console.log(`delelte hash: ${path2hash(path)}`);
+
+	// link not found
 	if (!doc.exists) {
 		R.response(res, false, 'Link Not Found');
 		return;
 	}
 
-	await doc.delete();
+	// delete link
+	await docRef.delete();
 	R.response(res, true, 'Link deleted.');
 };
 
@@ -157,4 +163,7 @@ exports.printAllURL = async () => {
 */
 const hash2path = (hash) => {
 	return `/${hash[0]}/${hash.slice(1)}`;
+};
+const path2hash = (path) => {
+	return path.replace(/\//g, '');
 };

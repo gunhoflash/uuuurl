@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const DB = require('./db');
 const R = require('./util/response');
+const auth = require('./util/auth');
 
 /*
 
@@ -30,7 +31,7 @@ app.use(express.static('public'));
 
 // GET
 app.get('/', (req, res) => {
-	res.render('index');
+	R.render(res, 'index');
 });
 
 app.route('/link')
@@ -40,12 +41,30 @@ app.route('/link')
 	.post(async (req, res) => {
 		await DB.insertURL(req, res, req.body.url, req.body.resType);
 	})
-	.delete(async (req, res) => { 
-		await DB.deleteURL(res, req.body.url);
+	.delete(async (req, res) => {
+		let input_password = req.body.password;
+		if (auth.is_admin(input_password)) {
+			await DB.deleteURL(res, req.body.path);
+		} else {
+			R.response(res, false, 'Incorrect password.');
+		}
 	});
 
 app.get('/:c/:hash', async (req, res) => {
 	await DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
+});
+
+app.get('/admin', (req, res) => {
+	R.render(res, 'admin');
+});
+
+app.post('/auth', async (req, res) => {
+	let input_password = req.body.password;
+	if (auth.is_admin(input_password)) {
+		R.render(res, 'index', { is_admin: true, password: input_password });
+	} else {
+		R.status(res, 401);
+	}
 });
 
 // handle 404

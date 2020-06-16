@@ -28,21 +28,54 @@
 	<script>
 		const searchAllURLs = async () => {
 			const origin = location.origin;
-			let data = await req('/link', 'GET');
-			data = data.data;
+			let response = await req('/link', 'GET');
+			let data = response.data;
+			let short_url, i, len, str;
 
-			let short_url, i = 0, str = '';
+			i = 0;
+			len = Object.keys(data).length;
+			str = `<p class="mb-4">${len} URL${(len > 1)?'s':''} shortened.</p>`
 			for (const doc of data) {
-				short_url = origin + doc.short;
-				str += `<div class="row mb-2">
+				short_url = origin + doc.path;
+				str += `<div class="row mb-2" data-path="${doc.path}">
 					<div class="column column-40 over-ellipsis">${doc.url}</div>
 					<div class="column column-40 over-ellipsis"><a id="shortened-${i}" href="${short_url}">${short_url}</a></div>
-					<div class="column t-end"><button class="button button-small button-reversal m-0 copy2clipboard" data-clipboard-target="#shortened-${i}">Copy</button></div>
+					<div class="column t-end">
+						<% if (typeof is_admin !== "boolean" || is_admin == false) { %>
+							<button class="button button-small button-reversal m-0 copy2clipboard" data-clipboard-target="#shortened-${i}">Copy</button>
+						<% } else { %>
+							<button class="button button-small button-reversal m-0" data-delete-path="${doc.path}">Delete</button>
+						<% } %>
+					</div>
 				</div>`;
 				i++;
 			}
+
+			// init list
 			document.getElementById('url_list').innerHTML = str;
-		};
+
+				<% if (typeof is_admin == "boolean" && is_admin == true) { %>
+					// add event listener to delete
+					for (const doc of data) {
+						document.querySelector(`button[data-delete-path="${doc.path}"]`)
+						.addEventListener('click', deleteURL);
+					}
+				<% } %>
+			};
+			
+			<% if (typeof is_admin == "boolean" && is_admin == true) { %>
+				const deleteURL = async (e) => {
+					let path = e.currentTarget.getAttribute('data-delete-path');
+					let response = await req('/link', 'DELETE', {
+						path: path,
+						password: '<%- password -%>'
+					});
+					if (response.result == 1) {
+						// success
+						document.querySelector(`.row[data-path="${path}"]`).remove();
+					}
+				};
+			<% } %>
 
 		searchAllURLs();
 	</script>
