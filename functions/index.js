@@ -35,30 +35,30 @@ app.get('/', (req, res) => {
 });
 
 app.route('/link')
-	.get(async (req, res) => {
-		await DB.searchAllURL(res);
+	.get((req, res) => {
+		DB.searchAllURL(res);
 	})
-	.post(async (req, res) => {
-		await DB.insertURL(res, req.body.url, req.body.resType);
+	.post((req, res) => {
+		DB.insertURL(res, req.body.url, req.body.resType);
 	})
-	.delete(async (req, res) => {
+	.delete((req, res) => {
 		let input_password = req.body.password;
 		if (auth.is_admin(input_password)) {
-			await DB.deleteURL(res, req.body.path);
+			DB.deleteURL(res, req.body.path);
 		} else {
 			R.response(res, false, 'Incorrect password.');
 		}
 	});
 
-app.get('/:c/:hash', async (req, res) => {
-	await DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
+app.get('/:c/:hash', (req, res) => {
+	DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
 });
 
 app.get('/admin', (req, res) => {
 	R.render(res, 'admin');
 });
 
-app.post('/auth', async (req, res) => {
+app.post('/auth', (req, res) => {
 	let input_password = req.body.password;
 	if (auth.is_admin(input_password)) {
 		R.render(res, 'index', { is_admin: true, password: input_password });
