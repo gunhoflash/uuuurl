@@ -133,7 +133,7 @@ exports.deleteURL = async (res, path) => {
 	let docRef = DB.collection('link').doc(path2hash(path));
 	let doc = await docRef.get();
 
-	console.log(`delelte hash: ${path2hash(path)}`);
+	console.log(`delete hash: ${path2hash(path)}`);
 
 	// link not found
 	if (!doc.exists) {
