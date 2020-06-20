@@ -3,14 +3,14 @@
 <%- include('common/head', { subtitle: 'Admin', include_js: true }); -%>
 <body class="vh-100 flex flex-column">
 	<div class="box p-4">
-        <h1>Admin page</h1>
-        <form method="POST" action="/auth" class="flex flex-column pb-3">
-            <fieldset class="box p-0">
-                <label for="input_password">Password</label>
-                <input type="password" name="password" id="input_password" class="mb-2" placeholder="type password" required>
-                <button class="button" type="submit">Submit</button>
-            </fieldset>
-        </form>
+		<h1>Admin page</h1>
+		<form method="POST" action="/auth" class="flex flex-column pb-3">
+			<fieldset class="box p-0">
+				<label for="input_password">Password</label>
+				<input type="password" name="password" id="input_password" class="mb-2" placeholder="type password" required>
+				<button class="button" type="submit">Submit</button>
+			</fieldset>
+		</form>
 		<a href="/" class="button mt-4">Back to uuuurl</a>
 	</div>
 </body>
