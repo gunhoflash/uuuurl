@@ -1,3 +1,4 @@
+const admin = require('firebase-admin');
 const R = require('./util/response');
 const crypto = require('crypto');
 const salt = require('./keys.json').salt;
@@ -12,8 +13,11 @@ let DB = null;
 	You should call it at first to use any other functions.
 
 */
-exports.initDB = (db) => {
-	DB = db;
+exports.initDB = (functions) => {
+	if (DB === null) {
+		admin.initializeApp(functions.config().firebase);
+		DB = admin.firestore();
+	}
 };
 
 /*
@@ -47,10 +51,12 @@ exports.searchURL = async (res, c, hash, no_redirect) => {
 
 	// find URL
 	hash = c + hash;
-	let doc = await DB.collection('link').doc(hash).get();
+	let docRef = DB.collection('link').doc(hash);
+	let doc = await docRef.get();
 
 	// if URL not found,
 	if (!doc.exists) {
+		console.log(`404 for ${hash}`);
 		if (no_redirect) {
 			R.response(res, false, 'Link not found');
 		} else {
@@ -59,9 +65,15 @@ exports.searchURL = async (res, c, hash, no_redirect) => {
 		return null;
 	}
 
-	// populate data and redirect or response.
+	// populate data
 	let data = await doc.data();
 	console.log(data);
+
+	// count up
+	let count = data.count || 0;
+	docRef.update({ count: count + 1 });
+
+	// redirect or response.
 	if (no_redirect) {
 		R.response(res, true, 'Link found.', data.url);
 	} else {
@@ -88,18 +100,21 @@ exports.insertURL = async (res, url, resType) => {
 
 	for (i = 2, len = full_hash.length; i < len; i++) {
 		hash = full_hash.slice(0, i);
-		let doc = await DB.collection('link').doc(hash);
-		let get = await doc.get();
+		let docRef = DB.collection('link').doc(hash);
+		let doc = await docRef.get();
 
-		if (get.exists) {
-			if (get.data().url == url) {
+		if (doc.exists) {
+			if (doc.data().url == url) {
 				// same url exist
 				break;
 			}
 		} else {
 			// save
 			console.log(`save "${url}" as "${hash}"`);
-			await doc.set({ url: url });
+			await docRef.set({
+				url: url,
+				count: 0
+			});
 			break;
 		}
 	}
@@ -151,6 +166,7 @@ exports.printAllURL = async () => {
 
 	console.log(`Print all URL:`);
 	let docs = snapshot.docs.map(doc => Object.assign(doc.data(), { short: doc.id }));
+	docs.sort((a, b) => b.count - a.count);
 	console.log(docs);
 	console.log(`${docs.length} found`);
 

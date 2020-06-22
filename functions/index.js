@@ -1,18 +1,9 @@
-const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors');
 const DB = require('./db');
 const R = require('./util/response');
 const auth = require('./util/auth');
-
-/*
-
-	Firestore
-
-*/
-admin.initializeApp(functions.config().firebase);
-DB.initDB(admin.firestore());
 
 /*
 
@@ -36,21 +27,25 @@ app.get('/', (req, res) => {
 
 app.route('/link')
 	.get((req, res) => {
+		DB.initDB(functions);
 		DB.searchAllURL(res);
 	})
 	.post((req, res) => {
+		DB.initDB(functions);
 		DB.insertURL(res, req.body.url, req.body.resType);
 	})
 	.delete((req, res) => {
 		let input_password = req.body.password;
 		if (auth.is_admin(input_password)) {
+			DB.initDB(functions);
 			DB.deleteURL(res, req.body.path);
 		} else {
 			R.response(res, false, 'Incorrect password.');
 		}
 	});
-
+	
 app.get('/:c/:hash', (req, res) => {
+	DB.initDB(functions);
 	DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
 });
 

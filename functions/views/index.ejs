@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('common/head', { include_js: true }); -%>
+<%- include('common/head'); -%>
 <body class="vh-100">
 	<div class="vh-100 flex flex-column box mx-auto">
 		<div class="p-3 w-100">
-			<img src="/img/uuuurl_plus.png" alt="uuuurl image">
+			<img src="https://raw.githubusercontent.com/gunhoflash/uuuurl/master/functions/public/img/uuuurl_plus.png" alt="uuuurl image">
 			<form method="POST" action="/link" class="flex flex-column pb-3">
 				<fieldset class="box p-0">
 					<label for="input_url">Type URL to shorten</label>
@@ -19,66 +19,136 @@
 	<div class="box mx-auto">
 		<div class="p-3">
 			<h2>Shortened URLs</h2>
-			<div id="url_list"></div>
+			<div id="url_list">(Now Loading ...)</div>
 		</div>
 	</div>
 	<hr>
 	<footer class="t-center p-4">gunhoflash@naver.com</footer>
 
 	<script>
+		/*
+
+			request
+
+		*/
+		let latencies = [];
+		const req = (url, method = 'GET', data = {}) => {
+			// Default options are marked with *
+			let t_start, t_end;
+			let requestInit = {
+				method: method, // *GET, POST, PUT, DELETE, etc.
+				mode: 'cors', // no-cors, cors, *same-origin
+				cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+				credentials: 'same-origin', // include, *same-origin, omit
+				headers: {
+					'Content-Type': 'application/json',
+					// 'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				redirect: 'follow', // manual, *follow, error
+				referrer: 'no-referrer', // no-referrer, *client
+			};
+
+			if (method === 'GET')
+				url += '?' + objectToQueryString(data);
+			else
+				// body data type must match "Content-Type" header
+				requestInit.body = JSON.stringify(data);
+
+			console.log(`fetch ${url}`, requestInit);
+			t_start = Date.now();
+			return fetch(url, requestInit)
+			.then(response => {
+				// parses JSON response into native JavaScript objects
+				t_end = Date.now();
+				console.log(response);
+				return response.json();
+			}, err => {
+				t_end = Date.now();
+				console.log(err);
+				return {};
+			})
+			.then(json => {
+				// save latency
+				latencies.unshift(t_end - t_start);
+				latencies.splice(7);
+
+				// calculate recent avg. latency
+				let sum = 0;
+				for (let n of latencies)
+					sum += n;
+				console.log(`Avg. latency of recent calls: ${Math.round(sum / latencies.length)}ms`);
+
+				return json;
+			});
+		};
+
+		const objectToQueryString = (obj) => Object.keys(obj).map(key => `${key}=${obj[key]}`).join('&');
+
+		/*
+
+			search all URLs
+
+		*/
 		const searchAllURLs = async () => {
 			const origin = location.origin;
 			let response = await req('/link', 'GET');
 			let data = response.data;
-			let short_url, i, len, str;
+			let s, c, i, len, str;
 
 			i = 0;
 			len = Object.keys(data).length;
-			str = `<p class="mb-4">${len} URL${(len > 1)?'s':''} shortened.</p>`
+			str = `<p class="mb-4">${len} URL${len>1?'s':''} shortened.</p>`
 			for (const doc of data) {
-				short_url = origin + doc.path;
-				str += `<div class="row mb-2" data-path="${doc.path}">
-					<div class="column column-40 over-ellipsis">${doc.url}</div>
-					<div class="column column-40 over-ellipsis"><a id="shortened-${i}" href="${short_url}">${short_url}</a></div>
-					<div class="column t-end">
-						<% if (typeof is_admin !== "boolean" || is_admin == false) { %>
-							<button class="button button-small button-reversal m-0 copy2clipboard" data-clipboard-target="#shortened-${i}">Copy</button>
-						<% } else { %>
-							<button class="button button-small button-reversal m-0" data-delete-path="${doc.path}">Delete</button>
-						<% } %>
-					</div>
-				</div>`;
+				s = origin + doc.path;
+				c = doc.count;
+				str += `<label>${c} view${c>1?'s':''}</label>
+					<div class="row mb-2" data-path="${doc.path}">
+						<div class="column column-40 over-ellipsis">${doc.url}</div>
+						<div class="column column-40 over-ellipsis"><a id="shortened-${i}" href="${s}">${s}</a></div>
+						<div class="column t-end">
+							<% if (typeof is_admin !== "boolean" || is_admin == false) { %>
+								<button class="button button-small button-reversal m-0 copy2clipboard" data-clipboard-target="#shortened-${i}">Copy</button>
+							<% } else { %>
+								<button class="button button-small button-reversal m-0" data-delete-path="${doc.path}">Delete</button>
+							<% } %>
+						</div>
+					</div>`;
 				i++;
 			}
 
 			// init list
 			document.getElementById('url_list').innerHTML = str;
 
-				<% if (typeof is_admin == "boolean" && is_admin == true) { %>
-					// add event listener to delete
-					for (const doc of data) {
-						document.querySelector(`button[data-delete-path="${doc.path}"]`)
-						.addEventListener('click', deleteURL);
-					}
-				<% } %>
-			};
-			
 			<% if (typeof is_admin == "boolean" && is_admin == true) { %>
-				const deleteURL = async (e) => {
-					let path = e.currentTarget.getAttribute('data-delete-path');
-					let response = await req('/link', 'DELETE', {
-						path: path,
-						password: '<%- password -%>'
-					});
-					if (response.result == 1) {
-						// success
-						document.querySelector(`.row[data-path="${path}"]`).remove();
-					}
-				};
+				// add event listener to delete
+				for (const doc of data) {
+					document.querySelector(`button[data-delete-path="${doc.path}"]`)
+					.addEventListener('click', deleteURL);
+				}
 			<% } %>
+		};
+
+		<% if (typeof is_admin == "boolean" && is_admin == true) { %>
+			/*
+
+				delete URL
+
+			*/
+			const deleteURL = async (e) => {
+				let path = e.currentTarget.getAttribute('data-delete-path');
+				let response = await req('/link', 'DELETE', {
+					path: path,
+					password: '<%- password -%>'
+				});
+				if (response.result == 1) {
+					// success
+					document.querySelector(`.row[data-path="${path}"]`).remove();
+				}
+			};
+		<% } %>
 
 		searchAllURLs();
 	</script>
-	<%- include('common/script'); -%>
+	<%- include('common/clipboard'); -%>
 </body>
 </html>
