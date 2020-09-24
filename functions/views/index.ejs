@@ -2,18 +2,16 @@
 <html lang="en">
 <%- include('common/head'); -%>
 <body class="vh-100">
-	<div class="vh-100 flex flex-column box mx-auto">
-		<div class="p-3 w-100">
-			<img src="https://raw.githubusercontent.com/gunhoflash/uuuurl/master/functions/public/img/uuuurl_plus.png" alt="uuuurl image">
-			<form method="POST" action="/link" class="flex flex-column pb-3">
-				<fieldset class="box p-0">
-					<label for="input_url">Type URL to shorten</label>
-					<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga" required>
-					<input type="hidden" name="resType" value="web">
-					<button class="button" type="submit">Shorten URL</button>
-				</fieldset>
-			</form>
-		</div>
+	<div class="vh-100 flex flex-column box mx-auto p-3">
+		<img src="https://raw.githubusercontent.com/gunhoflash/uuuurl/master/functions/public/img/uuuurl_plus.png" alt="uuuurl image">
+		<form method="POST" action="/link" class="flex flex-column w-100 pb-3">
+			<fieldset class="box p-0">
+				<label for="input_url">Type URL to shorten</label>
+				<input type="url" name="url" id="input_url" class="mb-2" placeholder="https://u-rl.ga" required>
+				<input type="hidden" name="resType" value="web">
+				<button class="button" type="submit">Shorten URL</button>
+			</fieldset>
+		</form>
 	</div>
 	<hr>
 	<div class="box mx-auto">
@@ -23,7 +21,10 @@
 		</div>
 	</div>
 	<hr>
-	<footer class="t-center p-4">gunhoflash@naver.com</footer>
+	<footer class="t-center p-4">
+		<a href="https://github.com/gunhoflash/uuuurl" target="_blank" rel="noopener noreferrer">View on Github</a>
+		gunhoflash@naver.com
+	</footer>
 
 	<script>
 		/*
