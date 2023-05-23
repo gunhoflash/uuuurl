@@ -104,7 +104,7 @@ exports.insertURL = async (res, url, resType) => {
 		let doc = await docRef.get();
 
 		if (doc.exists) {
-			if (doc.data().url == url) {
+			if (doc.data().url === url) {
 				// same url exist
 				break;
 			}
