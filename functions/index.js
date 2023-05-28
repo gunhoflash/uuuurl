@@ -46,7 +46,12 @@ app.route('/link')
 	
 app.get('/:c/:hash', (req, res) => {
 	DB.initDB(functions);
-	DB.searchURL(res, req.params.c, req.params.hash, req.params.no_redirect || false);
+	DB.searchURL(res, req.params.c + req.params.hash, req.params.no_redirect || false);
+});
+
+app.get('/u:hash', (req, res) => {
+	DB.initDB(functions);
+	DB.searchURL(res, req.params.hash, req.params.no_redirect || false);
 });
 
 app.get('/admin', (req, res) => {

@@ -44,13 +44,12 @@ exports.searchAllURL = async (res) => {
 	Redirect user to the URL or response.
 
 */
-exports.searchURL = async (res, c, hash, no_redirect) => {
+exports.searchURL = async (res, hash, no_redirect) => {
 
 	// handle exception: invalid value
-	if (R.isInvalid(res, c, hash)) return null;
+	if (R.isInvalid(res, hash)) return null;
 
 	// find URL
-	hash = c + hash;
 	let docRef = DB.collection('link').doc(hash);
 	let doc = await docRef.get();
 
@@ -98,7 +97,7 @@ exports.insertURL = async (res, url, resType) => {
 	full_hash = crypto.pbkdf2Sync(url, salt, iterations, keylen, 'sha512').toString('base64').replace('/', '_');
 	console.log(`full_hash: ${full_hash}`);
 
-	for (i = 2, len = full_hash.length; i < len; i++) {
+	for (i = 1, len = full_hash.length; i < len; i++) {
 		hash = full_hash.slice(0, i);
 		let docRef = DB.collection('link').doc(hash);
 		let doc = await docRef.get();
@@ -179,8 +178,8 @@ exports.printAllURL = async () => {
 
 */
 const hash2path = (hash) => {
-	return `/${hash[0]}/${hash.slice(1)}`;
+	return `/u${hash}`;
 };
 const path2hash = (path) => {
-	return path.replace(/\//g, '');
+	return path;
 };
